@@ -15,6 +15,16 @@ import {
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function DashboardLayout({
   children,
@@ -24,6 +34,7 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -33,12 +44,18 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/signout", {
+      const response = await fetch("/api/auth/signout", {
         method: "POST",
       });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
       router.replace("/login");
     } catch (error) {
       console.error("Logout error:", error);
+      // Optionally show error to user
     }
   };
 
@@ -144,7 +161,7 @@ export default function DashboardLayout({
             <Button
               variant="outline"
               className="w-full flex items-center justify-center"
-              onClick={handleLogout}
+              onClick={() => setShowLogoutDialog(true)}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -157,6 +174,24 @@ export default function DashboardLayout({
       <div className="lg:pl-64 pt-16 lg:pt-0">
         <main className="p-6">{children}</main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to logout?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              You&apos;ll need to sign in again to access your dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (

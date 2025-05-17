@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { Prisma } from "@prisma/client";
 
 export async function POST(request: Request) {
   try {
@@ -41,31 +40,26 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const searchQuery = searchParams.get("search");
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-
     const jobs = await prisma.job.findMany({
-      where: {
-        user: { email: session.user.email },
-        ...(status && status !== "all"
-          ? {
-              status: status as Prisma.EnumStatusFilter<"Job">,
-            }
-          : {}),
-      },
-      orderBy: { createdAt: "desc" },
+      where: searchQuery
+        ? {
+            OR: [
+              { title: { contains: searchQuery, mode: "insensitive" } },
+              { company: { contains: searchQuery, mode: "insensitive" } },
+              { description: { contains: searchQuery, mode: "insensitive" } },
+            ],
+          }
+        : undefined,
+      take: 20,
     });
 
     return NextResponse.json(jobs);
-  } catch (error) {
-    console.error("Error fetching jobs:", error);
+  } catch (error: unknown) {
+    console.error("Failed to fetch jobs:", error);
     return NextResponse.json(
       { error: "Failed to fetch jobs" },
       { status: 500 }

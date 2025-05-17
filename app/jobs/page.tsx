@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { Search, Briefcase, MapPin, Clock, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useSearchParams } from "next/navigation";
 
 interface Job {
   id: string;
@@ -103,6 +104,20 @@ const experienceLevels = [
 ];
 
 export default function JobsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin h-12 w-12 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+        </div>
+      }
+    >
+      <JobsPageContent />
+    </Suspense>
+  );
+}
+
+function JobsPageContent() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -113,14 +128,17 @@ export default function JobsPage() {
     useState("All Experience");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("/api/jobs");
-        if (!response.ok) {
-          throw new Error("Failed to fetch jobs");
-        }
+        const searchQuery = searchParams.get("search");
+        const url = searchQuery
+          ? `/api/jobs?search=${encodeURIComponent(searchQuery)}`
+          : "/api/jobs";
+
+        const response = await fetch(url);
         const data = await response.json();
         setJobs(data);
       } catch (error) {
@@ -131,7 +149,7 @@ export default function JobsPage() {
     };
 
     fetchJobs();
-  }, []);
+  }, [searchParams]);
 
   const enhancedJobs = jobs.map((job) => ({
     ...job,
@@ -220,7 +238,7 @@ export default function JobsPage() {
                   type="text"
                   placeholder="Search jobs, companies, or keywords"
                   className="pl-10 py-6 text-base"
-                  value={searchTerm}
+                  value=""
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
@@ -267,7 +285,7 @@ export default function JobsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {jobTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
+                        <SelectItem key="type" value={type}>
                           {type}
                         </SelectItem>
                       ))}
@@ -288,7 +306,7 @@ export default function JobsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
+                        <SelectItem key="category" value={category}>
                           {category}
                         </SelectItem>
                       ))}
@@ -309,7 +327,7 @@ export default function JobsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {experienceLevels.map((level) => (
-                        <SelectItem key={level} value={level}>
+                        <SelectItem key="level" value={level}>
                           {level}
                         </SelectItem>
                       ))}
@@ -346,6 +364,34 @@ export default function JobsPage() {
           </div>
         </div>
       </section>
+
+      {/* Display search results header if searching */}
+      {searchParams.get("search") && (
+        <div className="container mx-auto max-w-6xl px-4 mb-8">
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Search Results for:{" "}
+                <span className="text-blue-600">
+                  &quot;{searchParams.get("search")}&quot;
+                </span>
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {filteredJobs.length} matching jobs found
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="text-gray-600 hover:bg-gray-50"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear search
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Job Listings Section */}
       <section className="py-16 px-4">
@@ -442,7 +488,7 @@ export default function JobsPage() {
             </div>
           )}
 
-          {/* Pagination - For a real app, implement actual pagination */}
+          {/* Pagination */}
           <div className="mt-12 flex justify-center">
             <div className="flex space-x-2">
               <Button variant="outline" disabled>
@@ -517,56 +563,43 @@ export default function JobsPage() {
           >
             <AccordionItem value="item-1">
               <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                How do I apply for a job on JobiGolk?
+                How do I apply for jobs on this platform?
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-4">
-                To apply for a job, click on the job listing to view details.
-                After unlocking the job details, you&apos;ll find application
-                instructions including email addresses, phone numbers, or
-                application links. Follow the specific instructions provided by
-                the employer.
+                Click on any job listing to view details and application
+                instructions. Most listings will provide direct application
+                links or contact information.
               </AccordionContent>
             </AccordionItem>
+
             <AccordionItem value="item-2">
               <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                Why do I need to unlock job details?
+                Are these job listings verified?
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-4">
-                We use a simple unlock process to ensure that job seekers are
-                genuinely interested in the positions. This helps employers
-                receive more qualified applications and provides a better
-                experience for all users.
+                Yes, we verify all job postings before they appear on our
+                platform to ensure they&apos;re from legitimate employers.
               </AccordionContent>
             </AccordionItem>
+
             <AccordionItem value="item-3">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                How can I find jobs in a specific location?
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4">
-                Use the location filter in the search section at the top of the
-                jobs page. You can select specific cities or &quot;Remote&quot;
-                to find jobs that match your preferred location.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                Are the jobs on JobiGolk verified?
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4">
-                Yes, we verify all employers and job listings before they appear
-                on our platform. However, we recommend that job seekers always
-                exercise caution and research companies before sharing personal
-                information or attending interviews.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-5">
               <AccordionTrigger className="px-6 py-4 hover:no-underline">
                 How often are new jobs added?
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-4">
                 New jobs are added daily. We recommend checking back regularly
-                or setting up job alerts to be notified when new positions
-                matching your criteria are posted.
+                or using our search filters to find the latest opportunities.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4">
+              <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                Can I save job listings to view later?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4">
+                Currently, you need to create an account to save jobs.
+                We&apos;re working on adding this feature for guest users in the
+                future.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

@@ -8,7 +8,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -110,7 +109,7 @@ function LoginForm() {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4">
+      {/* <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-center text-gray-500">
           Demo credentials:
           <div className="mt-1 text-xs bg-gray-50 p-2 rounded border">
@@ -122,7 +121,7 @@ function LoginForm() {
             </div>
           </div>
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 }

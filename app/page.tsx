@@ -16,16 +16,15 @@ import {
   Instagram,
   Linkedin,
   Mail,
-  Menu,
   Phone,
   Twitter,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface JobCategory {
   id: string;
@@ -71,10 +70,18 @@ interface Job {
 }
 
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
   const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/jobs?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -183,114 +190,6 @@ export default function Home() {
 
   return (
     <>
-      {/* Navigation Bar */}
-      <header className="bg-white shadow-md sticky top-0 z-50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
-              <Briefcase className="h-8 w-8 text-blue-600" />
-              <span className="font-bold text-xl text-gray-900">JobiGolk</span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="font-medium text-blue-600">
-                Home
-              </Link>
-              <Link
-                href="/jobs"
-                className="font-medium text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Browse Jobs
-              </Link>
-              <Link
-                href="/categories"
-                className="font-medium text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Categories
-              </Link>
-              <Link
-                href="/about"
-                className="font-medium text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                About Us
-              </Link>
-              <Link
-                href="/contact"
-                className="font-medium text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Contact
-              </Link>
-            </nav>
-
-            {/* CTA Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Button variant="outline" className="font-medium">
-                Sign In
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 font-medium">
-                Post a Job
-              </Button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-gray-600"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="md:hidden py-4 border-t">
-              <nav className="flex flex-col space-y-4 pb-4">
-                <Link href="/" className="font-medium text-blue-600 py-2">
-                  Home
-                </Link>
-                <Link
-                  href="/jobs"
-                  className="font-medium text-gray-600 hover:text-blue-600 transition-colors py-2"
-                >
-                  Browse Jobs
-                </Link>
-                <Link
-                  href="/categories"
-                  className="font-medium text-gray-600 hover:text-blue-600 transition-colors py-2"
-                >
-                  Categories
-                </Link>
-                <Link
-                  href="/about"
-                  className="font-medium text-gray-600 hover:text-blue-600 transition-colors py-2"
-                >
-                  About Us
-                </Link>
-                <Link
-                  href="/contact"
-                  className="font-medium text-gray-600 hover:text-blue-600 transition-colors py-2"
-                >
-                  Contact
-                </Link>
-                <div className="flex space-x-4 pt-2">
-                  <Button variant="outline" className="font-medium flex-1">
-                    Sign In
-                  </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700 font-medium flex-1">
-                    Post a Job
-                  </Button>
-                </div>
-              </nav>
-            </div>
-          )}
-        </div>
-      </header>
       <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
         {/* Hero Section with Search */}
         <section className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-24">
@@ -302,19 +201,27 @@ export default function Home() {
               <p className="text-xl mb-10 text-blue-100">
                 Browse thousands of job opportunities across the island
               </p>
-              <div className="flex flex-col md:flex-row gap-3 shadow-lg rounded-lg overflow-hidden">
+              <form
+                onSubmit={handleSearch}
+                className="flex flex-col md:flex-row gap-3 shadow-lg rounded-lg overflow-hidden"
+              >
                 <div className="relative flex-grow">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
                     type="text"
                     placeholder="රැකියා සොයන්න... (Search for jobs...)"
                     className="pl-12 py-7 w-full bg-white text-black rounded-l-lg border-0 text-lg"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-7 px-10 rounded-r-lg text-lg border-0">
+                <Button
+                  type="submit"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-7 px-10 rounded-r-lg text-lg border-0"
+                >
                   සොයන්න (Search)
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
         </section>
@@ -331,7 +238,7 @@ export default function Home() {
                 for your skills and experience
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 sm:gap-6 gap-4">
               {jobCategories.map((category) => (
                 <Link
                   href={`/jobs?category=${category.id}`}
@@ -339,7 +246,7 @@ export default function Home() {
                   className="block"
                 >
                   <Card className="h-full hover:shadow-xl transition-all duration-300 border-t-4 border-t-blue-500 hover:-translate-y-1">
-                    <CardContent className="p-6 flex flex-col items-center text-center">
+                    <CardContent className="sm:p-6 p-2 flex flex-col items-center text-center">
                       <div
                         className={`${category.color} p-4 rounded-full mb-4`}
                       >
@@ -371,7 +278,62 @@ export default function Home() {
                 Browse our latest job opportunities
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+
+            {/* Mobile horizontal scroll */}
+            <div className="sm:hidden pb-4 -mx-4 px-4">
+              <div className="flex space-x-4 overflow-x-auto pb-4">
+                {recentJobs.map((job) => {
+                  const colors = getJobColors(job);
+                  return (
+                    <div
+                      key={job.id}
+                      className="min-w-full bg-white rounded-lg shadow border-l-4 ${colors.color} p-4"
+                      onClick={() => {
+                        window.location.href = `/jobs/${job.id}`;
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-10 h-10 rounded-md overflow-hidden bg-gray-100 flex-shrink-0 border">
+                          {job.logo ? (
+                            <Image
+                              src={job.logo}
+                              alt={job.company}
+                              width={40}
+                              height={40}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                              {job.company.charAt(0)}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-base truncate">
+                            {job.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 truncate">
+                            {job.company}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-3 space-y-1">
+                        <div className="flex items-center text-xs text-gray-500">
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">{job.location}</span>
+                        </div>
+                        <Badge className={`text-xs ${colors.badgeColor}`}>
+                          {job.type}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Desktop grid layout */}
+            <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {isLoading ? (
                 <div className="col-span-full flex justify-center py-12">
                   <div className="animate-spin h-12 w-12 border-4 border-blue-500 rounded-full border-t-transparent"></div>
@@ -384,65 +346,63 @@ export default function Home() {
                       key={job.id}
                       className={`hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 ${colors.color} hover:-translate-y-1`}
                     >
-                      <CardContent className="p-0">
-                        <div className="p-6">
-                          <div className="flex items-start mb-4">
-                            <div className="relative w-12 h-12 rounded-md overflow-hidden bg-gray-100 mr-4 flex-shrink-0 border">
-                              {job.logo ? (
-                                <Image
-                                  src={job.logo}
-                                  alt={job.company}
-                                  width={48}
-                                  height={48}
-                                  className="object-contain"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
-                                  {job.company.charAt(0)}
-                                </div>
+                      <CardContent className="p-6">
+                        <div className="flex items-start mb-4">
+                          <div className="relative w-12 h-12 rounded-md overflow-hidden bg-gray-100 mr-4 flex-shrink-0 border">
+                            {job.logo ? (
+                              <Image
+                                src={job.logo}
+                                alt={job.company}
+                                width={48}
+                                height={48}
+                                className="object-contain"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                                {job.company.charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-xl mb-1">
+                              {job.title}
+                            </h3>
+                            <p className="text-gray-700">{job.company}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-y-2 mb-4">
+                          <div className="flex items-center text-gray-500 mr-4">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            <span className="text-sm">{job.location}</span>
+                          </div>
+                          <div className="flex items-center text-gray-500">
+                            <Clock className="h-4 w-4 mr-1" />
+                            <span className="text-sm">
+                              {new Date(job.postedDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                }
                               )}
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-xl mb-1">
-                                {job.title}
-                              </h3>
-                              <p className="text-gray-700">{job.company}</p>
-                            </div>
+                            </span>
                           </div>
-                          <div className="flex flex-wrap gap-y-2 mb-4">
-                            <div className="flex items-center text-gray-500 mr-4">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              <span className="text-sm">{job.location}</span>
-                            </div>
-                            <div className="flex items-center text-gray-500">
-                              <Clock className="h-4 w-4 mr-1" />
-                              <span className="text-sm">
-                                {new Date(job.postedDate).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                          <Badge className={`mb-4 ${colors.badgeColor}`}>
-                            {job.type}
-                          </Badge>
                         </div>
-                        <div className="border-t">
-                          <Link href={`/jobs/${job.id}`}>
-                            <Button
-                              variant="ghost"
-                              className="w-full rounded-none h-12 font-medium"
-                            >
-                              වැඩිදුර කියවන්න (View Details)
-                            </Button>
-                          </Link>
-                        </div>
+                        <Badge className={`mb-4 ${colors.badgeColor}`}>
+                          {job.type}
+                        </Badge>
                       </CardContent>
+                      <div className="border-t">
+                        <Link href={`/jobs/${job.id}`}>
+                          <Button
+                            variant="ghost"
+                            className="w-full rounded-none h-12 font-medium"
+                          >
+                            වැඩිදුර කියවන්න (View Details)
+                          </Button>
+                        </Link>
+                      </div>
                     </Card>
                   );
                 })

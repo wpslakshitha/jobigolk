@@ -18,7 +18,6 @@ export async function GET(
     const job = await prisma.job.findUnique({
       where: {
         id,
-        user: { email: session.user.email },
       },
     });
 
