@@ -2,17 +2,8 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-// Public routes accessible without authentication
-const publicRoutes = ["/login", "/register", "/", "/about", "/contact"];
-
 // Protected routes requiring authentication
-const protectedRoutes = [
-  "/dashboard",
-  "/profile",
-  "/jobs",
-  "/applications",
-  "/settings",
-];
+const protectedRoutes = ["/dashboard"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -21,15 +12,13 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
-    pathname.includes(".")
+    pathname.includes(".") ||
+    pathname.startsWith("/jobs/") // Allow all job pages
   ) {
     return NextResponse.next();
   }
 
   // Check route types
-  const isPublicRoute = publicRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
   const isProtectedRoute = protectedRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
@@ -41,7 +30,7 @@ export async function middleware(request: NextRequest) {
   });
 
   // Handle redirects based on authentication status
-  if (!token && isProtectedRoute) {
+  if (!token && isProtectedRoute && !pathname.startsWith("/jobs")) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
