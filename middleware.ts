@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
     pathname.includes(".") ||
-    pathname.startsWith("/jobs/") // Allow all job pages
+    pathname.startsWith("/jobs") // Allow all job pages including /jobs/[jobid]
   ) {
     return NextResponse.next();
   }
