@@ -344,56 +344,55 @@ export default function JobDetails() {
           </CardContent>
         </Card>
       </div>
-
       {/* Unlock Dialog - Cannot be closed until unlocked */}
       <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-w-[95vw] w-[95vw] sm:w-full sm:max-w-md mx-2">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+            <DialogTitle className="text-lg sm:text-xl font-semibold flex items-center gap-2">
               Unlock Job Details
               {isUnlocked ? (
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
               ) : (
-                <Lock className="h-5 w-5 text-orange-500" />
+                <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
               )}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm sm:text-base">
               Complete the steps below to view full job information
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 py-4">
+          <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
             {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+            <div className="space-y-1 sm:space-y-2">
+              <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-500">Unlock Progress</span>
                 <span className="font-medium">{unlockProgress}%</span>
               </div>
-              <Progress value={unlockProgress} className="h-2" />
+              <Progress value={unlockProgress} className="h-1 sm:h-2" />
             </div>
             {/* Unlock Instructions */}
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-              <div className="flex gap-3">
-                <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 sm:p-4">
+              <div className="flex gap-2 sm:gap-3">
+                <Info className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <h4 className="font-medium text-blue-900">
+                  <h4 className="text-sm sm:text-base font-medium text-blue-900">
                     රැකියා විස්තර අගුළු හැරීමේ උපදෙස්
                   </h4>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-xs sm:text-sm text-blue-700">
                     1. &quot;Unlock Job&quot; බොත්තම ක්ලික් කරන්න
                   </p>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-xs sm:text-sm text-blue-700">
                     2. විවෘත වන පළමු දැන්වීම් පිටුව නරඹන්න
                   </p>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-xs sm:text-sm text-blue-700">
                     3. ආපසු මෙම පිටුවට පැමිණෙන්න
                   </p>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-xs sm:text-sm text-blue-700">
                     4. &quot;Unlock Job&quot; බොත්තම නැවත ක්ලික් කරන්න
                   </p>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-xs sm:text-sm text-blue-700">
                     5. විවෘත වන දෙවන දැන්වීම් පිටුව නරඹන්න
                   </p>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-xs sm:text-sm text-blue-700">
                     6. ආපසු මෙම පිටුවට පැමිණෙන්න
                   </p>
                 </div>
@@ -401,24 +400,24 @@ export default function JobDetails() {
             </div>
             {/* Status Message */}
             {isUnlocked ? (
-              <div className="bg-green-50 border border-green-100 rounded-lg p-4 text-center">
-                <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h4 className="font-medium text-green-800 mb-1">
+              <div className="bg-green-50 border border-green-100 rounded-lg p-3 sm:p-4 text-center">
+                <CheckCircle2 className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 mx-auto mb-1 sm:mb-2" />
+                <h4 className="text-sm sm:text-base font-medium text-green-800 mb-1">
                   Job Details Unlocked!
                 </h4>
-                <p className="text-sm text-green-700">
+                <p className="text-xs sm:text-sm text-green-700">
                   You can now view the complete job details.
                 </p>
               </div>
             ) : (
-              <div className="bg-orange-50 border border-orange-100 rounded-lg p-4 text-center">
-                <Lock className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                <h4 className="font-medium text-orange-800 mb-1">
+              <div className="bg-orange-50 border border-orange-100 rounded-lg p-3 sm:p-4 text-center">
+                <Lock className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 mx-auto mb-1 sm:mb-2" />
+                <h4 className="text-sm sm:text-base font-medium text-orange-800 mb-1">
                   {unlockProgress === 0
                     ? "Job Details Locked"
                     : "Step 1 Completed"}
                 </h4>
-                <p className="text-sm text-orange-700">
+                <p className="text-xs sm:text-sm text-orange-700">
                   {unlockProgress === 0
                     ? "Follow the instructions above to unlock the complete job details."
                     : "Please complete Step 2 to fully unlock the job details."}
@@ -426,35 +425,36 @@ export default function JobDetails() {
               </div>
             )}
           </div>
-          <DialogFooter className="flex flex-col sm:flex-row gap-3">
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Button
               onClick={handleUnlock}
-              className={`w-full ${
+              className={`w-full text-sm sm:text-base ${
                 isUnlocked
                   ? "bg-orange-500 hover:bg-orange-600"
                   : unlockProgress >= 50
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
+              size="sm"
             >
               {isUnlocked ? (
                 <>
-                  <Unlock className="h-4 w-4 mr-2" />
+                  <Unlock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Reset Unlock
                 </>
               ) : unlockProgress >= 50 ? (
                 <>
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Complete Unlock (Step 2)
                 </>
               ) : (
                 <>
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Start Unlock (Step 1)
                 </>
               )}
             </Button>
-          </DialogFooter>{" "}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

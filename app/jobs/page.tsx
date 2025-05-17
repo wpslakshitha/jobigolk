@@ -418,65 +418,72 @@ function JobsPageContent() {
               <Button onClick={clearFilters}>Clear Filters</Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortedJobs.slice(0, 12).map((job) => (
                 <Link href={`/jobs/${job.id}`} key={job.id}>
                   <Card
                     className={`hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 ${job.color} hover:-translate-y-1 h-full cursor-pointer`}
                   >
-                    <CardContent className="p-0">
-                      <div className="p-6">
-                        <div className="flex items-start mb-4">
-                          <div className="relative w-12 h-12 rounded-md overflow-hidden bg-gray-100 mr-4 flex-shrink-0 border">
-                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
-                              {job.company.charAt(0)}
-                            </div>
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-xl mb-1 line-clamp-2">
-                              {job.title}
-                            </h3>
-                            <p className="text-gray-700">{job.company}</p>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-md overflow-hidden bg-gray-100 flex-shrink-0 border">
+                          <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                            {job.company.charAt(0)}
                           </div>
                         </div>
-                        <div className="flex flex-wrap gap-y-2 mb-4">
-                          <div className="flex items-center text-gray-500 mr-4">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            <span className="text-sm">{job.location}</span>
-                          </div>
-                          <div className="flex items-center text-gray-500">
-                            <Clock className="h-4 w-4 mr-1" />
-                            <span className="text-sm">
-                              {new Date(job.postedDate).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                }
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          <Badge className={job.badgeColor}>{job.type}</Badge>
-                          <Badge variant="outline" className="bg-gray-50">
-                            {job.category}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center text-gray-700">
-                          <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>{job.experience}</span>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-lg sm:text-xl mb-1 line-clamp-2">
+                            {job.title}
+                          </h3>
+                          <p className="text-gray-700 text-sm sm:text-base truncate">
+                            {job.company}
+                          </p>
                         </div>
                       </div>
-                      <div className="border-t p-4 bg-gray-50 flex justify-between items-center">
-                        <div className="font-medium text-gray-900">
+                      <div className="mt-3 sm:mt-4 flex flex-wrap gap-y-1 sm:gap-y-2">
+                        <div className="flex items-center text-gray-500 text-xs sm:text-sm mr-3">
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span>{job.location}</span>
+                        </div>
+                        <div className="flex items-center text-gray-500 text-xs sm:text-sm">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span>
+                            {new Date(job.postedDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
+                        <Badge
+                          className={`text-xs sm:text-sm ${job.badgeColor}`}
+                        >
+                          {job.type}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className="bg-gray-50 text-xs sm:text-sm"
+                        >
+                          {job.category}
+                        </Badge>
+                      </div>
+                      <div className="mt-3 sm:mt-4 flex items-center text-gray-700 text-sm sm:text-base">
+                        <Briefcase className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-gray-500" />
+                        <span>{job.experience}</span>
+                      </div>
+                      <div className="mt-3 sm:mt-4 border-t pt-3 sm:pt-4 flex justify-between items-center">
+                        <div className="font-medium text-gray-900 text-sm sm:text-base">
                           {job.salary}
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-blue-600"
+                          className="text-blue-600 text-xs sm:text-sm"
                         >
                           View Job
                         </Button>
