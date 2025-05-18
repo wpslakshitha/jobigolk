@@ -47,12 +47,6 @@ export function Header() {
                 Browse Jobs
               </Link>
               <Link
-                href="/categories"
-                className="font-medium text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Categories
-              </Link>
-              <Link
                 href="/about"
                 className="font-medium text-gray-600 hover:text-blue-600 transition-colors"
               >
@@ -111,12 +105,7 @@ export function Header() {
                 >
                   Browse Jobs
                 </Link>
-                <Link
-                  href="/categories"
-                  className="font-medium text-gray-600 hover:text-blue-600 transition-colors py-2"
-                >
-                  Categories
-                </Link>
+
                 <Link
                   href="/about"
                   className="font-medium text-gray-600 hover:text-blue-600 transition-colors py-2"
