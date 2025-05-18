@@ -33,7 +33,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 
@@ -346,7 +345,7 @@ export default function JobDetails() {
       </div>
       {/* Unlock Dialog - Cannot be closed until unlocked */}
       <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
-        <DialogContent className="max-w-[95vw] w-[95vw] sm:w-full sm:max-w-md mx-2">
+        <DialogContent className="max-w-[90vw] w-[95vw] sm:w-full sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl font-semibold flex items-center gap-2">
               Unlock Job Details
@@ -356,9 +355,6 @@ export default function JobDetails() {
                 <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
               )}
             </DialogTitle>
-            <DialogDescription className="text-sm sm:text-base">
-              Complete the steps below to view full job information
-            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
             {/* Progress Bar */}
