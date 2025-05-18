@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   X,
+  Image,
 } from "lucide-react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -124,6 +125,13 @@ export default function DashboardLayout({
           >
             <Briefcase className="h-5 w-5" />
             <span>Manage Jobs</span>
+          </Link>
+          <Link
+            href="/dashboard/image-generator"
+            className="flex items-center space-x-2 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100"
+          >
+            <Image className="h-5 w-5" aria-hidden="true" />
+            <span>Image Generator</span>
           </Link>
 
           {(user as { role?: string }).role === "admin" && (

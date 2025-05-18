@@ -13,15 +13,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
     pathname.includes(".") ||
-    pathname.startsWith("/jobs") // Allow all job pages including /jobs/[jobid]
+    pathname.startsWith("/jobs")
   ) {
     return NextResponse.next();
   }
-
-  // Check route types
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
 
   // Get authentication token
   const token = await getToken({
@@ -29,15 +24,18 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // Handle redirects based on authentication status
-  if (!token && isProtectedRoute && !pathname.startsWith("/jobs")) {
+  // Handle protected routes
+  if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Handle auth pages redirect
   if (token && (pathname === "/login" || pathname === "/register")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
+    const redirectUrl = callbackUrl || "/dashboard";
+    return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
 
   return NextResponse.next();
