@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,68 +32,54 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MoreVertical, Plus, Search, Edit, Trash2, Eye } from "lucide-react";
+import {
+  MoreVertical,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  Copy,
+} from "lucide-react";
 
-// Mock job data
-const mockJobs = [
-  {
-    id: "job1",
-    title: "Senior Software Engineer",
-    company: "TechLanka Solutions",
-    location: "Colombo",
-    type: "Full-time",
-    status: "active",
-    postedDate: "2023-11-15",
-    applications: 24,
-  },
-  {
-    id: "job2",
-    title: "Marketing Manager",
-    company: "Global Brands Sri Lanka",
-    location: "Kandy",
-    type: "Full-time",
-    status: "active",
-    postedDate: "2023-11-12",
-    applications: 18,
-  },
-  {
-    id: "job3",
-    title: "Customer Service Representative",
-    company: "Ceylon Services",
-    location: "Galle",
-    type: "Part-time",
-    status: "expired",
-    postedDate: "2023-10-05",
-    applications: 32,
-  },
-  {
-    id: "job4",
-    title: "Financial Analyst",
-    company: "Lanka Finance",
-    location: "Colombo",
-    type: "Full-time",
-    status: "active",
-    postedDate: "2023-11-10",
-    applications: 15,
-  },
-  {
-    id: "job5",
-    title: "Graphic Designer",
-    company: "Creative Solutions",
-    location: "Colombo",
-    type: "Freelance",
-    status: "draft",
-    postedDate: "2023-11-14",
-    applications: 0,
-  },
-];
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  status: string;
+  postedDate: string;
+  applications: number;
+}
 
 export default function JobsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch("/api/jobs");
+        if (!response.ok) {
+          throw new Error("Failed to fetch jobs");
+        }
+        const data = await response.json();
+        setJobs(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   // Filter jobs based on search term and status
-  const filteredJobs = mockJobs.filter((job) => {
+  const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -128,6 +114,17 @@ export default function JobsManagement() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+          <p className="text-gray-500">Please wait while we fetch your jobs.</p>
+        </div>
+      </div>
+    ) 
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -149,7 +146,7 @@ export default function JobsManagement() {
         <CardHeader>
           <CardTitle>Your Job Listings</CardTitle>
           <CardDescription>
-            You have posted {mockJobs.length} jobs in total
+            You have posted {jobs.length} jobs in total
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -190,7 +187,7 @@ export default function JobsManagement() {
                     Posted Date
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Applications
+                    Copy Button
                   </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -227,7 +224,17 @@ export default function JobsManagement() {
                         {formatDate(job.postedDate)}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {job.applications}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const jobUrl = `${window.location.origin}/jobs/${job.id}`;
+                            const textToCopy = `වැඩි විස්තර - ${jobUrl}\nඅයදුම් කරන ආකාරය - ${jobUrl}`;
+                            navigator.clipboard.writeText(textToCopy);
+                          }}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>

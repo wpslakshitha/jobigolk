@@ -1,12 +1,12 @@
 // app/image-generator/page.tsx
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button"; // Assuming Shadcn/UI setup
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { PlusCircle, XCircle, Download, Loader2 } from "lucide-react"; // Lucide icons
+import { PlusCircle, XCircle, Download, Loader2, Copy } from "lucide-react"; // Lucide icons
 import Image from "next/image"; // For displaying images
 
 interface GeneratedImage {
@@ -15,17 +15,62 @@ interface GeneratedImage {
   title: string; // Original title for download filename
 }
 
+interface Job {
+  id: string;
+  title: string;
+}
+
 export default function ImageGeneratorPage() {
   const [jobTitles, setJobTitles] = useState<string[]>([""]); // Start with one empty title
   const [contactPhone, setContactPhone] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
   const [contactWebsite, setContactWebsite] = useState<string>("");
   const [bottomText, setBottomText] = useState<string>(
-    "For more job opportunities, visit our website!"
+    "For more job opportunities, visit our website!" // Default value for bottom text
   );
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const addJobTitle = (title: string) => {
+    // Remove empty strings first if needed
+    const filteredTitles = jobTitles.filter((t) => t.trim() !== "");
+    if (!filteredTitles.includes(title)) {
+      setJobTitles([...filteredTitles, title]);
+    }
+  };
+
+  const copyJobDetails = (title: string) => {
+    // Find the job that matches this title
+    const job = jobs.find((j) => j.title === title);
+    if (job) {
+      const jobUrl = `https://jobigolk.vercel.app/jobs/${job.id}`;
+      const textToCopy = `වැඩි විස්තර - ${jobUrl}\nඅයදුම් කරන ආකාරය - ${jobUrl}`;
+      navigator.clipboard.writeText(textToCopy);
+    }
+  };
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch("/api/jobs");
+        if (!response.ok) {
+          throw new Error("Failed to fetch jobs");
+        }
+        const data = await response.json();
+        setJobs(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to fetch jobs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const handleTitleChange = (index: number, value: string) => {
     const newTitles = [...jobTitles];
@@ -138,6 +183,31 @@ export default function ImageGeneratorPage() {
       >
         <div>
           <Label className="text-lg font-semibold mb-2 block">Job Titles</Label>
+
+          {/* Clickable job titles from jobs list */}
+          {!loading && jobs.length > 0 && (
+            <div className="mb-4">
+              <Label className="text-sm font-medium mb-2 block">
+                Select from existing jobs:
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {jobs.map((job) => (
+                  <Button
+                    key={job.id}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addJobTitle(job.title)}
+                    className="text-sm"
+                  >
+                    {job.title}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Existing title input fields */}
           {jobTitles.map((title, index) => (
             <div key={index} className="flex items-center space-x-2 mb-2">
               <Input
@@ -159,13 +229,14 @@ export default function ImageGeneratorPage() {
               )}
             </div>
           ))}
+
           <Button
             type="button"
             variant="outline"
             onClick={addTitleField}
             className="mt-2"
           >
-            <PlusCircle className="h-4 w-4 mr-2" /> Add Another Title
+            <PlusCircle className="h-4 w-4 mr-2" /> Add Custom Title
           </Button>
         </div>
 
@@ -251,8 +322,22 @@ export default function ImageGeneratorPage() {
                 className="border rounded-lg overflow-hidden shadow-sm bg-card"
               >
                 <div
-                  className="relative w-full"
+                  className="relative w-full cursor-pointer"
                   style={{ paddingBottom: "100%" }}
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(image.src);
+                      const blob = await response.blob();
+                      await navigator.clipboard.write([
+                        new ClipboardItem({
+                          [blob.type]: blob,
+                        }),
+                      ]);
+                      // You might want to add a toast notification here
+                    } catch (err) {
+                      console.error("Failed to copy image:", err);
+                    }
+                  }}
                 >
                   {" "}
                   {/* Aspect ratio 1:1 */}
@@ -263,13 +348,27 @@ export default function ImageGeneratorPage() {
                     objectFit="contain" // or "cover"
                   />
                 </div>
-                <div className="p-2 text-center">
+                <div className="p-2 text-center flex gap-2 justify-center">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => downloadImage(image.src, image.title)}
                   >
                     <Download className="h-3 w-3 mr-1" /> Download
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyJobDetails(image.title)}
+                  >
+                    <Copy className="h-3 w-3 mr-1" /> Link
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigator.clipboard.writeText(image.title)}
+                  >
+                    <Copy className="h-3 w-3 mr-1" /> Title
                   </Button>
                 </div>
               </div>
