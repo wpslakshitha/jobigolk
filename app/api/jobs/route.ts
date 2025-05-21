@@ -54,7 +54,6 @@ export async function GET(request: Request) {
             ],
           }
         : undefined,
-      take: 20,
     });
 
     return NextResponse.json(jobs);
