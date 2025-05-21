@@ -33,7 +33,7 @@ model Job {
   description         String
   responsibilities    String[]
   requirements        String[]
-  contactEmail        String
+  contactEmail        String?
   contactPhone        String?
   applicationDeadline DateTime
   isRemote            Boolean  @default(false)

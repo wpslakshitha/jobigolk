@@ -106,7 +106,6 @@ export default function NewJob() {
         !jobData.category ||
         !jobData.experience ||
         !jobData.description ||
-        !jobData.contactEmail ||
         !jobData.applicationDeadline
       ) {
         throw new Error("Please fill all required fields");
@@ -202,6 +201,9 @@ export default function NewJob() {
           newJobData.company = String(jsonData.company);
         if (jsonData.location !== undefined)
           newJobData.location = String(jsonData.location);
+
+        if (jsonData.salary!== undefined)
+          newJobData.salary = String(jsonData.salary);
 
         if (jsonData.type !== undefined) {
           const jsonType = String(jsonData.type).trim();
@@ -331,7 +333,6 @@ export default function NewJob() {
 
         setJobData(newJobData);
         console.log("Successfully filled form from JSON:", newJobData);
-        alert("Form fields updated successfully from JSON data!"); // Or use a toast
       } else {
         // Parsed JSON, but it doesn't look like a job object (e.g., it's an array or empty object)
         console.error(
@@ -616,7 +617,6 @@ export default function NewJob() {
                   placeholder="e.g. careers@company.com"
                   value={jobData.contactEmail}
                   onChange={handleChange}
-                  required
                 />
               </div>
               <div className="space-y-2">
